@@ -1,0 +1,288 @@
+---
+title: "STATS 4310 - Tuan Pham - Finance Application"
+author: "Tuan Pham"
+date: "2023-10-25"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Part1:**
+
+</b>
+</b>
+
+## Part 1a:
+
+</b>
+
+**Stock pick:**
+
+</b>
+
+|Underlying Stock | Ticker  | Beta  | PE Ratio  | Growth Estimate(5yrs) |
+|:----------------|:--------|:------|:----------|:----------------------|
+|Microsoft        |MFST     |N/A    |32.91      |14.30%                 |
+|Lockheed Martin  |LMT      |0.62   |16.41      |10.69%                 |
+|Enphase Energy   |ENPH     |1.51   |23.91      |27.60%                 |
+
+
+</b>
+
+## Part 1b:
+
+</b>
+
+```{r message=FALSE, warning=FALSE}
+# Quantitative Financial Modelling Framework
+library(quantmod)
+```
+
+</b>
+
+```{r}
+# Set the time frame of desired observation 
+start<- as.Date("2019-01-01")
+end<-as.Date("2023-11-13")
+```
+
+</b>
+
+```{r}
+# get desired tickers by getSymbols function
+MSFT <- getSymbols("MSFT",from=start, to=end, auto.assign=F)
+LMT <- getSymbols("LMT",from=start, to=end, auto.assign=F)
+ENPH <- getSymbols("ENPH",from=start, to=end, auto.assign=F)
+
+```
+
+</b>
+
+```{r}
+## Close price
+MSFT.close <- MSFT[ ,4]
+LMT.close <- LMT[ ,4]
+ENPH.close <- ENPH[ ,4]
+```
+
+</b>
+
+```{r}
+# Daily Return function - The difference between open and close price of an underlying stock
+MSFT.return <- dailyReturn(MSFT.close)
+LMT.return <- dailyReturn(LMT.close)
+ENPH.return <- dailyReturn(ENPH.close)
+
+```
+
+
+
+`Microsoft`
+
+```{r}
+plot(MSFT.close, type='l', col='green', main = "Microsoft")
+```
+
+`Lockheed Martin Corp.`
+
+```{r}
+plot(LMT.close, type='l', col='blue', main = "Lockheed Martin")
+```
+
+`Enphase Energy`
+
+```{r}
+plot(ENPH.close, type='l', col='red', main = "Enphase Energy")
+
+```
+
+</b>
+
+## Part 1c:
+
+</b>
+
+`Annualized Expected Return and Annualized Risk`
+
+```{r}
+## Microsoft
+MSFT.exp.annual.return <- mean(MSFT.return) * 252
+MSFT.exp.annual.risk <- sd(MSFT.return) * sqrt(252)
+MSFT.rr <- c(MSFT.exp.annual.return, MSFT.exp.annual.risk)
+MSFT.rr
+```
+
+</b>
+
+> Microsoft(MSFT) has annualized expected return of 31.42% and annualized risk of 30.79%
+
+```{r}
+## Lockheed Martin
+LMT.exp.annual.return <- mean(LMT.return) * 252
+LMT.exp.annual.risk <- sd(LMT.return) * sqrt(252)
+LMT.rr <- c(LMT.exp.annual.return, LMT.exp.annual.risk)
+LMT.rr
+```
+
+> Lockheed Martin(LMT) has annualized expected return of 14.17% and annualized risk of 26.38%
+
+</b>
+
+```{r}
+## Enphase Energy
+ENPH.exp.annual.return <- mean(ENPH.return) * 252
+ENPH.exp.annual.risk <- sd(ENPH.return) * sqrt(252)
+ENPH.rr <- c(ENPH.exp.annual.return, ENPH.exp.annual.risk)
+ENPH.rr
+```
+</b>
+
+> Enphase Energy(ENPH)  has annualized expected return of 86.36% and annualized risk of 77.23%
+
+</b>
+
+```{r}
+plot(MSFT.rr[2], MSFT.rr[1], pch=16, col="green", ylim=c(0, 1.30), xlim=c(0, .80), xlab = 'Annualized Risk', ylab = 'Annualized Return')
+points(LMT.rr[2], LMT.rr[1], pch=16, col="blue")
+points(ENPH.rr[2], ENPH.rr[1], pch=16, col="red")
+```
+
+</b>
+
+## Part 1d:
+
+</b>
+
+
+```{r}
+## SPY (S&P500 ETF)
+SPY <- getSymbols("SPY",from=start, to=end, auto.assign=F)
+SPY.close <- SPY[ ,4]
+SPY.return <- dailyReturn(SPY.close)
+```
+
+</b>
+
+```{r}
+MSFT.cum.return <- cumprod(1 + MSFT.return)
+LMT.cum.return <- cumprod(1 + LMT.return)
+ENPH.cum.return <- cumprod(1 + ENPH.return)
+SPY.cum.return <- cumprod(1 + SPY.return)
+```
+
+</b>
+
+```{r}
+plot(SPY.cum.return, type="l", ylim=c(0, 70), main = 'Cumulative Return in last 4 years')
+lines(MSFT.cum.return, type="l", col="green")
+lines(LMT.cum.return, type="l", col="blue")
+lines(ENPH.cum.return, type="l", col="red")
+
+```
+
+</b>
+
+```{r}
+plot(ENPH.cum.return, type="l", col="red")
+```
+</b>
+
+```{r}
+plot(SPY.cum.return, type="l", ylim=c(0, 4), main = 'Cumulative Return in last 4 years')
+lines(MSFT.cum.return, type="l", col="green")
+lines(LMT.cum.return, type="l", col="blue")
+```
+
+</b>
+
+# **Part2:**
+
+</b>
+</b>
+
+## Part 2a:
+</b>
+
+```{r message=FALSE, warning=FALSE}
+rf <- read.csv('F-F_Research_Data_Factors_daily.CSV', head=T, skip=3)
+rf$date <- as.Date(rf$X, format='%Y%m%d')
+attach(rf)
+head(rf)
+```
+
+```{r}
+rf <- na.omit(rf)
+rf.avg <- mean(rf$RF)
+rf.avg
+```
+
+  
+```{r}
+# Risk-free rate during the last 4 years
+rf.new <- subset(rf, date >= start & date <= end)
+rf.average <- mean(rf.new$RF)
+```
+  
+
+Excess returns are the return earned by a stock (or portfolio of stocks) and the risk free rate, which is usually estimated using the most recent short-term government treasury bill.
+
+For example, if a stock earns 15% in a year when the U.S. treasury bill earned 3%, the excess returns on the stock were 15% - 3% = 12%.
+
+```{r}
+SPY.excess <- 252 * (SPY.return - rf.avg)
+MSFT.excess <- 252 * (MSFT.return - rf.avg)
+LMT.excess <- 252 * (LMT.return - rf.avg)
+ENPH.excess <- 252 * (ENPH.return - rf.avg)
+head(SPY.excess)
+```
+```{r}
+plot(SPY.excess$daily.returns, MSFT.excess$daily.returns, pch=20, type = 'p')
+```
+
+</b>
+
+## Part 2b:
+
+</b>
+
+```{r}
+MSFT.Alpha.Beta <- coef(lm(MSFT.excess ~ SPY.excess))
+MSFT.Alpha.Beta
+```
+
+
+```{r}
+LMT.Alpha.Beta <- coef(lm(LMT.excess ~ SPY.excess))
+LMT.Alpha.Beta
+```
+
+```{r}
+ENPH.Alpha.Beta <- coef(lm(ENPH.excess ~ SPY.excess))
+ENPH.Alpha.Beta
+```
+
+```{r}
+MSFT.Rsquare <- summary(lm(MSFT.excess ~ SPY.excess))$r.squared
+MSFT.Rsquare
+```
+```{r}
+LMT.Rsquare <- summary(lm(LMT.excess ~ SPY.excess))$r.squared
+LMT.Rsquare
+```
+
+```{r}
+ENPH.Rsquare <- summary(lm(ENPH.excess ~ SPY.excess))$r.squared
+ENPH.Rsquare
+```
+</br>
+
+|Underlying Stock | Ticker  | Alpha   | Beta    | Rsquare     |
+|:----------------|:--------|:--------|:--------|:------------|
+|Microsoft        |MFST     |0.75     |1.20     |0.68         |
+|Lockheed Martin  |LMT      |-1.04    |0.64     |0.27         |
+|Enphase Energy   |ENPH     |2.42     |1.58     |0.19         |
