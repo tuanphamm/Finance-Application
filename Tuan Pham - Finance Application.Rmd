@@ -270,6 +270,7 @@ ENPH.Alpha.Beta
 MSFT.Rsquare <- summary(lm(MSFT.excess ~ SPY.excess))$r.squared
 MSFT.Rsquare
 ```
+
 ```{r}
 LMT.Rsquare <- summary(lm(LMT.excess ~ SPY.excess))$r.squared
 LMT.Rsquare
